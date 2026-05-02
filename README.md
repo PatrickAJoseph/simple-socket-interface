@@ -24,11 +24,35 @@ The receiver sends its response through the second socket in the following forma
 
 **retargs**: The value of the return arguments in string format
 
-## Software architecture
+## Software flow
+
+Initiator side software flow
 
 ```mermaid
 graph TD
-    A[Start] --> B{Is it working?}
-    B -- Yes --> C[Great!]
-    B -- No --> D[Fix it]
-    D --> B
+    A[Application code] --SSP.send(command, args)--> B{Is command found in command list ?}
+    B -- Yes --> C[Convert command to request JSON string structure]
+    C --> E[Try to send over string over socket]
+    E --> F{Packet sent successfully ?}
+    F -- Yes --> G[Wait for response packet from server]
+    F -- No --> H[Return with error code RQST_TIMEOUT] --> A
+    B -- No --> D[Return CMD_NOT_FOUND error code]
+    G ---> I{Received response packet from server within timeout}
+    I --Yes-->J[Decode the received response packet and store the response arguments/values passed from the server and return status OK]-->A
+    I --No--> K[Return error code RSP_TIMEOUT]-->A
+    D --> A
+```
+
+Responder side software flow
+
+```mermaid
+graph TD
+    A[Wait for command from initiator] --> B{Received command from initiator ?} --No command--> A
+
+    B --Yes--> C{Is command present in the responder's command list ?}
+
+    C --No--> D[Return error code UNKNOWN_CMD] --> A
+
+    C --Yes--> E[Call the callback function present in the callback list to process received command]
+
+    E --Yes--> A
