@@ -1,6 +1,8 @@
 from enum import Enum
 import socket
 from typing import ByteString
+from typing import Callable
+from typing import List
 
 class SSI_role(Enum):
     SSI_ROLE_INITIATOR = 0
@@ -29,6 +31,7 @@ class SSI:
         self.iwrr_socket : socket.socket
         self.irrw_socket : socket.socket
         self.host = "127.0.0.1"
+        self.command_list : List[(str, Callable)] = []
 
         # Check arguments.
 
@@ -101,3 +104,49 @@ class SSI:
     
     def write_to_responder(self, payload: bytearray):
         self.iwrr_socket.sendall(payload)
+    
+    def add_command(self, command: str, callback: Callable) -> SSI_status:
+
+        if( self.role == SSI_role.SSI_ROLE_INITIATOR ):
+            return SSI_status.SSI_OK
+
+        command_found = False
+
+        for entry in self.command_list:
+
+            if entry[0] == command or entry[1] == callback:
+                command_found = True
+                break
+        
+        if(command_found == False):
+            self.command_list.append((command, callback))
+            return SSI_status.SSI_OK
+        
+        return SSI_status.SSI_CMD_DUPLICATE
+
+    def get_command_callback(self, command: str) -> Callable:
+
+        for entry in self.command_list:
+
+            if entry[0] == command:
+
+                return entry[1]
+        
+        return Callable(None)
+
+    def remove_command(self, command: str) -> SSI_status:
+
+        if( self.role == SSI_role.SSI_ROLE_INITIATOR ):
+            return SSI_status.SSI_OK
+        
+        index = 0
+
+        for entry in self.command_list:
+
+            if entry[0] == command:
+                self.command_list.remove((command,self.get_command_callback(command)))
+                return SSI_status.SSI_OK
+
+            index = index + 1
+        
+        return SSI_status.SSI_CMD_NOT_FOUND
