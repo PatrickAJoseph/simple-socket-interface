@@ -122,7 +122,7 @@ Remove command from the command list.
 
 
 ```Python
-SSI.send(command: str, args: List[str]) -> SSI.status
+SSI.query(command: str, args: List[str]) -> SSI.status
 ```
 
 **command**: Name of the command to be processed.
@@ -130,7 +130,7 @@ SSI.send(command: str, args: List[str]) -> SSI.status
 **args**: Arguments to be passed along with the command.
 
 ```Python
-SSI.process()
+SSI.serve()
 ```
 
 This function is called only by the **responder**. This function reads the incoming byets from the receiver socket and sends out the response via the response socket to the initiator.
