@@ -87,11 +87,20 @@ SSI.status = { SSI_OK, SSI_CMD_NOT_FOUND, SSI_RQST_TIMEOUT, SSI_RSP_TIMEOUT, SSI
 **SSI_CMD_DUPLICATE**: Command is a duplicate command.
 
 ```Python
-SSI.open(role: SSI.role)
+SSI(role: SSI.role, rqst_port: int, rsp_port: int, rqst_timeout: float rsp_timeout: float)
 ```
 
+Open an SSI instance with at target port and set the required request and response timeouts.
 
-Open a socket connection with a 
+**role**: The role to be played by the instance. SSI_ROLE_INITIATOR and SSI_ROLE_RESPONDER are the two valid values.
+
+**rqst_port**: The port number to be used by the socket connection between the initiator and responder through which the initiator sends packets and the responder received them.
+
+**rsp_port**: The port number to be used by the connection between the initiator and the responder through which the responder sends packets and the initiator received them.
+
+**rqst_timeout**: Timeout for sending message from the initiator to the responder.
+
+**rsp_timeout**: Timeout for sending messages from the responder to the initiator.
 
 ```Python
 SSI.add_command(command: str,callback)
@@ -113,7 +122,7 @@ Remove command from the command list.
 
 
 ```Python
-SSI.send(command: str, args: List[string]) -> SSI.status
+SSI.send(command: str, args: List[str]) -> SSI.status
 ```
 
 **command**: Name of the command to be processed.
