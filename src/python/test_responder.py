@@ -4,22 +4,50 @@ from ssi import SSI_role
 from typing import List
 
 def command_1_callback(command: str, args: List[str]) -> List[str]:
-    print("Command 1 callback executed")
+    numbers: float = []
+
+    result: float = 0
+
+    for element in args:
+        numbers.append(float(element))
+
+    for element in numbers:
+        result = result + element
+
+    return [str(result)]
 
 def command_2_callback(command: str, args: List[str]) -> List[str]:
-    print("Command 2 callback executed")
+    numbers: float = []
+
+    result: float = 0
+
+    for element in args:
+        numbers.append(float(element))
+
+    for element in numbers:
+        result = result - element
+
+    return [str(result)]
 
 def command_3_callback(command: str, args: List[str]) -> List[str]:
-    print("Command 3 callback executed")
+    numbers: float = []
+
+    result: float = 1
+
+    for element in args:
+        numbers.append(float(element))
+
+    for element in numbers:
+        result = result * element
+
+    return [str(result)]
+
 
 x = SSI(SSI_role.SSI_ROLE_RESPONDER, 3300, 3301, 5.0, 5.0)
 
-x.add_command("COMMAND_1", command_1_callback)
-x.add_command("COMMAND_2", command_2_callback)
-x.add_command("COMMAND_3", command_3_callback)
+x.add_command("add", command_1_callback)
+x.add_command("subtract", command_2_callback)
+x.add_command("multiply", command_3_callback)
 
-print(x.command_list)
-
-x.remove_command("COMMAND_2")
-
-print(x.command_list)
+while True:
+    x.serve()
